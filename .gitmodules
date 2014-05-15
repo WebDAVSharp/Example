@@ -1,0 +1,3 @@
+[submodule "WebDAVSharp.Server"]
+	path = WebDAVSharp.Server
+	url = https://github.com/WebDAVSharp/WebDAVSharp.Server.git
