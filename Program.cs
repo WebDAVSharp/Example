@@ -44,8 +44,7 @@ namespace WebDAVSharp.Example
         private static void StartServer()
         {
             WebDavServer server = new WebDavServer(new WebDavDiskStore(Localpath));
-            server.Listener.Prefixes.Add(Url);
-            server.Start();
+            server.Start(Url);
         }
     }
 }

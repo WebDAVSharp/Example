@@ -53,10 +53,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WebDAVSharp.Server, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>WebDAVSharp.Server\bin\Debug\WebDAVSharp.Server.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -69,6 +65,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="WebDAVSharp.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="WebDAVSharp.Server\WebDAVSharp.Server.csproj">
+      <Project>{be8a04dd-c704-40b2-8ad2-3655b429fae1}</Project>
+      <Name>WebDAVSharp.Server</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
