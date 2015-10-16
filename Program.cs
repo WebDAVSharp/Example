@@ -1,50 +1,53 @@
-﻿using System.Net;
-using Common.Logging;
-using System.Collections.Specialized;
-using WebDAVSharp.Server;
-using WebDAVSharp.Server.Adapters;
-using WebDAVSharp.Server.Stores.DiskStore;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.ServiceProcess;
+using WebDAVSharp.FileExample.Framework;
 
-namespace WebDAVSharp.Example
+namespace WebDAVSharp.FileExample
 {
-    class Program
+    internal class Program
     {
-        // IMPORTANT !!
-        // change these variables to your wanted configuration
-        private const string Localpath = @"c:\";
-        private const string Url = "http://localhost:8880/";
-
-        /// <summary>
-        /// Mains the specified arguments.
-        /// </summary>
-        /// <param name="args">The arguments.</param>
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            InitConsoleLogger();
-            StartServer();
-        }
+            try
+            {
+                // if install was a command line flag, then run the installer at runtime.
+                if (args.Contains("-install", StringComparer.InvariantCultureIgnoreCase))
+                {
+                    WindowsServiceInstaller.RuntimeInstall<ServiceImplementation>();
+                }
 
-        /// <summary>
-        /// Initializes the console logger.
-        /// </summary>
-        private static void InitConsoleLogger()
-        {
-            // create properties
-            NameValueCollection properties = new NameValueCollection();
-            properties["showDateTime"] = "true";
-            // set Adapter
-            LogManager.Adapter =
-                new Common.Logging.Simple.ConsoleOutLoggerFactoryAdapter(properties);
-        }
+                // if uninstall was a command line flag, run uninstaller at runtime.
+                else if (args.Contains("-uninstall", StringComparer.InvariantCultureIgnoreCase))
+                {
+                    WindowsServiceInstaller.RuntimeUnInstall<ServiceImplementation>();
+                }
 
-        /// <summary>
-        /// Starts the server.
-        /// Authentication used: Negotiate
-        /// </summary>
-        private static void StartServer()
-        {
-            WebDavServer server = new WebDavServer(new WebDavDiskStore(Localpath));
-            server.Start(Url);
+                // otherwise, fire up the service as either console or windows service based on UserInteractive property.
+                else
+                {
+                    var implementation = new ServiceImplementation();
+
+                    // if started from console, file explorer, etc, run as console app.
+                    if (Environment.UserInteractive)
+                    {
+                        ConsoleHarness.Run(args, implementation);
+                    }
+
+                    // otherwise run as a windows service
+                    else
+                    {
+                        Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+                        ServiceBase.Run(new WindowsServiceHarness(implementation));
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                ConsoleHarness.WriteToConsole(ConsoleColor.Red, "An exception occurred in Main(): {0}", ex);
+            }
         }
     }
 }
